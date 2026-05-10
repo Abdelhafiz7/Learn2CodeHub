@@ -6,7 +6,10 @@
 *.suo
 *.userosscache
 *.sln.docstates
-*.appsettings.json
+# Local secrets
+appsettings.Development.json
+appsettings.Production.json
+appsettings.*.json
 
 # Database
 *.sqlite
