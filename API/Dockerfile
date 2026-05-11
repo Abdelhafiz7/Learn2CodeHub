@@ -12,5 +12,5 @@ FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
 WORKDIR /app
 RUN mkdir -p /app/db && chmod 777 /app/db
 COPY --from=publish /app/publish .
-COPY LearnToCode.db /app/db/LearnToCode.db
+COPY --from=build /src/LearnToCode.db /app/db/LearnToCode.db
 ENTRYPOINT ["dotnet", "API.dll"]
