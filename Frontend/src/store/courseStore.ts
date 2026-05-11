@@ -11,6 +11,7 @@ interface CourseState {
 
   // Actions
   setCourses: (courses: Course[], total: number) => void;
+  appendCourses: (courses: Course[], total: number) => void;
   setFilters: (filters: Partial<CourseFilters>) => void;
   setPage: (page: number) => void;
   setLoading: (loading: boolean) => void;
@@ -20,7 +21,7 @@ interface CourseState {
 
 const defaultFilters: CourseFilters = {
   page: 1,
-  pageSize: 12,
+  pageSize: 8,
   sortBy: 'newest',
 };
 
@@ -33,6 +34,11 @@ export const useCourseStore = create<CourseState>((set) => ({
   error: null,
 
   setCourses: (courses, total) => set({ courses, totalCourses: total }),
+  appendCourses: (newCourses, total) =>
+    set((state) => ({
+      courses: [...state.courses, ...newCourses],
+      totalCourses: total,
+    })),
 
   setFilters: (newFilters) =>
     set((state) => ({

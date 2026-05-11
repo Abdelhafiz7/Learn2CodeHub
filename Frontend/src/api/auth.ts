@@ -1,8 +1,6 @@
-import axios from "axios";
 import axiosInstance from "./axiosInstance";
 import type { AuthResponse, LoginRequest, RegisterRequest, RegisterResponse } from "@/types";
 
-type NewType = RegisterRequest;
 
 export const authApi = {
   login: async (data: LoginRequest): Promise<AuthResponse> => {

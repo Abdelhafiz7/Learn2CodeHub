@@ -1,3 +1,4 @@
+using System.IO.Compression;
 using System.Security.Claims;
 using API.Data;
 using API.Entities;
@@ -31,6 +32,33 @@ namespace API.Controllers
             {
                 var search = queryDto.Search.Trim().ToLower();
                 query = query.Where(c => c.Title.ToLower().Contains(search));
+
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (userIdClaim != null)
+                {
+                    var userId = int.Parse(userIdClaim);
+
+                    var matchedCategory = await context.Categories
+                        .FirstOrDefaultAsync(c => c.Name.ToLower().Contains(search));
+
+                    var recentlySarched = await context.UserSearchHistories
+                        .AnyAsync(h => h.UserId == userId &&
+                                  h.SearchTerm.ToLower() == search && 
+                                  h.SearchedAt > DateTime.UtcNow.AddHours(-1));
+
+                    if (!recentlySarched)
+                    {
+                        context.UserSearchHistories.Add( new UserSearchHistory
+                        {
+                            UserId = userId,
+                            SearchTerm = search,
+                            CategoryId = matchedCategory?.Id,
+                            SearchedAt = DateTime.UtcNow
+                        });
+
+                        await context.SaveChangesAsync();
+                    }
+                }
             }
 
             if (queryDto.CategoryId.HasValue)
@@ -54,6 +82,7 @@ namespace API.Controllers
                     Id = c.Id,
                     Title = c.Title,
                     Description = c.Description,
+                    ShortDescription = c.ShortDescription,
                     Price = c.Price,
                     ThumbnailUrl = c.ThumbnailUrl,
                     Language = c.Language,
@@ -61,11 +90,12 @@ namespace API.Controllers
                     CategoryName = c.Category.Name,
                     Level = c.Level,
 
-
                     Instructor = new InstructorDto
                     {
+                        Id = c.Instructor.Id,
                         FirstName = c.Instructor.FirstName,
-                        LastName = c.Instructor.LastName
+                        LastName = c.Instructor.LastName,
+                        ProfileImageUrl = c.Instructor.ProfileImageUrl
                     },
 
                     TotalLessons = c.Sections
@@ -80,7 +110,8 @@ namespace API.Controllers
                         ? c.Reviews.Average(r => r.Rating)
                         : 0,
 
-                    ReviewCount = c.Reviews.Count()
+                    ReviewCount = c.Reviews.Count(),
+                    EnrollmentCount = c.Enrollments.Count()
                 })
                 .ToListAsync();
 
@@ -554,14 +585,130 @@ namespace API.Controllers
                 {
                     Id = c.Id,
                     Title = c.Title,
+                    ShortDescription = c.ShortDescription,
                     ThumbnailUrl = c.ThumbnailUrl,
                     Level = c.Level,
+                    Price = c.Price,
+                    CategoryName = c.Category.Name,
+                    Instructor = new InstructorDto
+                    {
+                        Id = c.Instructor.Id,
+                        FirstName = c.Instructor.FirstName,
+                        LastName = c.Instructor.LastName,
+                        ProfileImageUrl = c.Instructor.ProfileImageUrl
+                    },
+                    TotalLessons = c.Sections.SelectMany(s => s.Lessons).Count(),
+                    TotalDuration = c.Sections.SelectMany(s => s.Lessons).Sum(l => (int?)l.DurationInMinutes) ?? 0,
                     Rating = c.Reviews.Any() ? c.Reviews.Average(r => r.Rating) : 0,
                     ReviewCount = c.Reviews.Count(),
+                    EnrollmentCount = c.Enrollments.Count()
                 })
                 .ToListAsync();
 
             return Ok(related);
+        }
+
+        [HttpGet("recommendations")]
+        [Authorize]
+        public async Task<ActionResult<List<CourseDto>>> GetRecommendations()
+        {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
+            var enrolledIds = await context.Enrollments
+                .Where(e => e.UserId == userId)
+                .Select(e => e.CourseId)
+                .ToListAsync();
+
+            var recentSearches = await context.UserSearchHistories
+                .Where(h => h.UserId == userId)
+                .OrderByDescending(h => h.SearchedAt)
+                .Take(10)
+                .ToListAsync();
+
+
+            List<CourseDto> recommendations = new();
+
+            if (recentSearches.Any())
+            {
+                var searchTerms = recentSearches
+                    .Select(s => s.SearchTerm.ToLower())
+                    .ToList();
+
+                var categoryId = recentSearches
+                    .Where(s => s.CategoryId != null)
+                    .Select(s => s.CategoryId!.Value)
+                    .Distinct()
+                    .ToList();
+
+                recommendations = await context.Courses
+                    .Where(c => c.IsPublished && !enrolledIds.Contains(c.Id))
+                    .Where(c => categoryId.Contains(c.CategoryId) ||
+                           searchTerms.Any(term => c.Title.ToLower().Contains(term))
+                )
+
+                .Include(c => c.Reviews)
+                .Include(c => c.Enrollments)
+                .OrderByDescending(c => c.Enrollments.Count)
+                .Take(6)
+                .Select(c => new CourseDto
+                {
+                    Id = c.Id,
+                    Title = c.Title,
+                    ShortDescription = c.ShortDescription,
+                    ThumbnailUrl = c.ThumbnailUrl,
+                    Level = c.Level,
+                    Price = c.Price,
+                    CategoryName = c.Category.Name,
+                    Instructor = new InstructorDto
+                    {
+                        Id = c.Instructor.Id,
+                        FirstName = c.Instructor.FirstName,
+                        LastName = c.Instructor.LastName,
+                        ProfileImageUrl = c.Instructor.ProfileImageUrl
+                    },
+                    TotalLessons = c.Sections.SelectMany(s => s.Lessons).Count(),
+                    TotalDuration = c.Sections.SelectMany(s => s.Lessons).Sum(l => (int?)l.DurationInMinutes) ?? 0,
+                    Rating = c.Reviews.Any() ? c.Reviews.Average(r => r.Rating) : 0,
+                    ReviewCount = c.Reviews.Count(),
+                    EnrollmentCount = c.Enrollments.Count()
+                })
+                .ToListAsync();
+            }
+
+            if (!recommendations.Any())
+            {
+                recommendations = await context.Courses 
+                    .Where(c => c.IsPublished && !enrolledIds.Contains(c.Id))
+                    .Include(c => c.Reviews)
+                    .Include(c => c.Enrollments)
+                    .OrderByDescending(c => c.Enrollments.Count)
+                    .Take(6)
+                    .Select(c => new CourseDto
+                    {
+                        Id = c.Id,
+                        Title = c.Title,
+                        ShortDescription = c.ShortDescription,
+                        ThumbnailUrl = c.ThumbnailUrl,
+                        Level = c.Level,
+                        Price = c.Price,
+                        CategoryName = c.Category.Name,
+                        Instructor = new InstructorDto
+                        {
+                            Id = c.Instructor.Id,
+                            FirstName = c.Instructor.FirstName,
+                            LastName = c.Instructor.LastName,
+                            ProfileImageUrl = c.Instructor.ProfileImageUrl
+                        },
+                        TotalLessons = c.Sections.SelectMany(s => s.Lessons).Count(),
+                        TotalDuration = c.Sections.SelectMany(s => s.Lessons).Sum(l => (int?)l.DurationInMinutes) ?? 0,
+                        Rating = c.Reviews.Any() ? c.Reviews.Average(r => r.Rating) : 0,
+                        ReviewCount = c.Reviews.Count(),
+                        EnrollmentCount = c.Enrollments.Count()
+                    })
+                    .ToListAsync();
+            }
+
+            return Ok(recommendations);
         }
 
     }

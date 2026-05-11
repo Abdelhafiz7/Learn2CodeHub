@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Search, Filter, BookOpen, ChevronRight } from 'lucide-react';
+import { Search, Filter, BookOpen, ChevronRight, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { LoadingSpinner } from '@/components/ui';
 import { CourseCard } from '@/components/course';
@@ -17,6 +17,7 @@ export const CoursesPage: React.FC = () => {
     isLoading,
     currentPage,
     setCourses,
+    appendCourses,
     setFilters,
     setPage,
     setLoading,
@@ -46,7 +47,11 @@ export const CoursesPage: React.FC = () => {
       setLoading(true);
       try {
         const response = await coursesApi.getCourses(filters);
-        setCourses(response.items, response.totalCount);
+        if (filters.page === 1) {
+          setCourses(response.items, response.totalCount);
+        } else {
+          appendCourses(response.items, response.totalCount);
+        }
       } catch (err) {
         const msg = getErrorMessage(err);
         setError(msg);
@@ -59,7 +64,6 @@ export const CoursesPage: React.FC = () => {
   }, [filters]);
 
   const toggleLevel = (level: CourseLevel) => {
-    const currentLevels = filters.level ? [filters.level] : [];
     setFilters({ ...filters, level: filters.level === level ? undefined : level, page: 1 });
   };
 
@@ -149,12 +153,13 @@ export const CoursesPage: React.FC = () => {
       categoryId: undefined,
       level: undefined,
       page: 1,
-      pageSize: 12,
+      pageSize: 8,
       sortBy: 'newest'
     });
   };
 
-  const totalPages = Math.ceil((totalCourses ?? 0) / (filters.pageSize ?? 12));
+  const hasMore = courses.length < (totalCourses ?? 0);
+
 
   return (
     <div className="min-h-screen bg-white dark:bg-[#0B0E14] transition-colors duration-300">
@@ -418,39 +423,30 @@ export const CoursesPage: React.FC = () => {
                 ))}
               </div>
 
-              {/* PAGINATION */}
-              {totalPages > 1 && (
-                <div className="mt-24 flex items-center justify-center gap-4">
-                  <button
-                    disabled={currentPage === 1}
-                    onClick={() => setPage(currentPage - 1)}
-                    className="px-8 py-4 bg-white dark:bg-[#1C1F26] border border-gray-200 dark:border-gray-800 rounded-2xl font-black text-gray-700 dark:text-gray-300 disabled:opacity-30 hover:bg-gray-50 transition-all hover:border-indigo-500"
-                  >
-                    Previous
-                  </button>
-                  <div className="flex gap-3">
-                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                      // Simple sliding window or just first 5 for now
-                      return i + 1;
-                    }).map((page) => (
-                      <button
-                        key={page}
-                        onClick={() => setPage(page)}
-                        className={`w-14 h-14 rounded-2xl font-black transition-all ${currentPage === page
-                          ? 'bg-indigo-600 text-white shadow-2xl shadow-indigo-500/40 scale-110'
-                          : 'bg-white dark:bg-[#1C1F26] border border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-50 hover:border-indigo-500'
-                          }`}
-                      >
-                        {page}
-                      </button>
-                    ))}
+              {/* LOAD MORE BUTTON */}
+              {hasMore && (
+                <div className="mt-20 flex flex-col items-center gap-6 py-12 border-t border-gray-100 dark:border-gray-800 animate-in fade-in slide-in-from-bottom-4">
+                  <div className="flex items-center gap-4">
+                    <div className="h-[1px] w-12 bg-gray-200 dark:bg-gray-800" />
+                    <span className="text-xs font-black uppercase tracking-widest text-gray-400">
+                      Showing {courses.length} of {totalCourses} courses
+                    </span>
+                    <div className="h-[1px] w-12 bg-gray-200 dark:bg-gray-800" />
                   </div>
+
                   <button
-                    disabled={currentPage === totalPages}
                     onClick={() => setPage(currentPage + 1)}
-                    className="px-8 py-4 bg-white dark:bg-[#1C1F26] border border-gray-200 dark:border-gray-800 rounded-2xl font-black text-gray-700 dark:text-gray-300 disabled:opacity-30 hover:bg-gray-50 transition-all hover:border-indigo-500"
+                    disabled={isLoading}
+                    className="group relative flex items-center gap-3 px-12 py-5 bg-white dark:bg-[#1C1F26] border border-gray-200 dark:border-gray-800 rounded-2xl text-base font-black text-gray-900 dark:text-white transition-all hover:border-indigo-500 hover:shadow-2xl hover:shadow-indigo-500/10 active:scale-95 disabled:opacity-50"
                   >
-                    Next
+                    <div className="absolute inset-0 bg-indigo-500/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
+                    {isLoading ? (
+                      <div className="h-5 w-5 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <Sparkles className="w-5 h-5 text-indigo-500" />
+                    )}
+                    {isLoading ? 'Loading more...' : 'Load more courses'}
+                    {!isLoading && <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-indigo-500 transition-colors rotate-90" />}
                   </button>
                 </div>
               )}

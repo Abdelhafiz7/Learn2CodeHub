@@ -10,6 +10,7 @@ import {
   Search,
   Filter,
   Sparkles,
+  ChevronDown,
 } from "lucide-react";
 
 export const CategoryDetailPage: React.FC = () => {
@@ -24,6 +25,7 @@ export const CategoryDetailPage: React.FC = () => {
   const [selectedLevels, setSelectedLevels] = useState<CourseLevel[]>([]);
   const [selectedPrices, setSelectedPrices] = useState<string[]>([]);
   const [selectedDurations, setSelectedDurations] = useState<string[]>([]);
+  const [visibleCount, setVisibleCount] = useState(8);
   const [sortBy, setSortBy] = useState("relevant");
   const clearFilters = () => {
     setSearchQuery("");
@@ -329,16 +331,40 @@ export const CategoryDetailPage: React.FC = () => {
 
           {/* COURSES GRID */}
           {filteredCourses.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-              {filteredCourses.map((course, index) => (
-                <div 
-                  key={course.id}
-                  className="animate-in fade-in slide-in-from-bottom-8" 
-                  style={{ animationDelay: `${index * 50}ms` }}
-                >
-                  <CourseCard course={course} />
+            <div className="space-y-12">
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                {filteredCourses.slice(0, visibleCount).map((course, index) => (
+                  <div 
+                    key={course.id}
+                    className="animate-in fade-in slide-in-from-bottom-8" 
+                    style={{ animationDelay: `${index * 50}ms` }}
+                  >
+                    <CourseCard course={course} />
+                  </div>
+                ))}
+              </div>
+
+              {filteredCourses.length > visibleCount && (
+                <div className="flex flex-col items-center gap-6 py-12 border-t border-gray-100 dark:border-gray-800 animate-in fade-in slide-in-from-bottom-4">
+                  <div className="flex items-center gap-4">
+                    <div className="h-[1px] w-12 bg-gray-200 dark:bg-gray-800" />
+                    <span className="text-xs font-black uppercase tracking-widest text-gray-400">
+                      Showing {Math.min(visibleCount, filteredCourses.length)} of {filteredCourses.length} courses
+                    </span>
+                    <div className="h-[1px] w-12 bg-gray-200 dark:bg-gray-800" />
+                  </div>
+
+                  <button
+                    onClick={() => setVisibleCount(prev => prev + 8)}
+                    className="group relative flex items-center gap-3 px-10 py-4 bg-white dark:bg-[#1C1F26] border border-gray-200 dark:border-gray-800 rounded-2xl text-sm font-black text-gray-900 dark:text-white transition-all hover:border-indigo-500 hover:shadow-2xl hover:shadow-indigo-500/10 active:scale-95"
+                  >
+                    <div className="absolute inset-0 bg-indigo-500/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <Sparkles className="w-4 h-4 text-indigo-500" />
+                    Load more courses
+                    <ChevronDown className="w-4 h-4 text-gray-400 group-hover:text-indigo-500 transition-colors" />
+                  </button>
                 </div>
-              ))}
+              )}
             </div>
           ) : (
             <div className="text-center py-24 bg-gray-50 dark:bg-[#1C1F26]/30 rounded-3xl border border-dashed border-gray-300 dark:border-gray-800">

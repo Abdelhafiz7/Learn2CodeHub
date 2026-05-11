@@ -58,7 +58,7 @@ export const coursesApi = {
 
   getFeaturedCourses: async (): Promise<Course[]> => {
     const res = await axiosInstance.get<PaginatedResponse<Course>>('/courses', {
-      params: { pageSize: 12 },
+      params: { pageSize: 8 },
     });
     return res.data.items;
   },
@@ -94,6 +94,11 @@ export const coursesApi = {
 
   getMe: async () => {
     const res = await axiosInstance.get('/auth/me');
+    return res.data;
+  },
+
+  getRecommendations: async (): Promise<Course[]> => {
+    const res = await axiosInstance.get<Course[]>('/courses/recommendations');
     return res.data;
   },
 
@@ -156,16 +161,16 @@ export const coursesApi = {
 
   // Admin
   adminGetAllCourses: async (params?: { page?: number; pageSize?: number; search?: string; category?: string }) => {
-  const response = await axiosInstance.get('/dashboard/admin/courses', { params }); 
-  return response.data;
- },
+    const response = await axiosInstance.get('/dashboard/admin/courses', { params });
+    return response.data;
+  },
 
   adminDeleteCourse: async (id: string): Promise<void> => {
-    await axiosInstance.delete(`/dashboard/admin/courses/${id}`); 
+    await axiosInstance.delete(`/dashboard/admin/courses/${id}`);
   },
 
   adminUpdateCourseStatus: async (id: string, status: string) => {
-    const response = await axiosInstance.patch(`/dashboard/admin/courses/${id}/status`, { status }); 
+    const response = await axiosInstance.patch(`/dashboard/admin/courses/${id}/status`, { status });
     return response.data;
   },
 

@@ -21,6 +21,7 @@ public class WebContext : DbContext
     public DbSet<Wishlist> Wishlists { get; set; }
     public DbSet<LearningActivity> LearningActivities { get; set; }
     public DbSet<Notes> LessonNotes { get; set; }
+    public DbSet<UserSearchHistory> UserSearchHistories { get; set; }
 }
 
 
