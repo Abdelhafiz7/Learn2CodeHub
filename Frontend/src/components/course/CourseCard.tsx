@@ -1,8 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  Clock, 
-  BookOpen, 
+import {
+  Clock,
+  BookOpen,
   ArrowRight,
   BarChart2,
   Users

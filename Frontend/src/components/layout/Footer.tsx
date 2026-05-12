@@ -5,10 +5,9 @@ import logoUrl from '@/assets/Learn2codehub.png';
 
 export const Footer: React.FC = () => {
   return (
-    <footer className="border-t border-gray-200 bg-white">
+    <footer className="border-t border-gray-200 bg-white dark:bg-gray-950 transition-colors duration-200">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
-          {/* Brand */}
           <div className="col-span-1 md:col-span-2">
             <Link to="/" className="flex items-center">
               <img src={logoUrl} alt="Learn To Code Hub" className="h-8 w-auto invert dark:invert-0" />
@@ -27,7 +26,6 @@ export const Footer: React.FC = () => {
             </div>
           </div>
 
-          {/* Links */}
           <div>
             <h4 className="text-sm font-semibold text-gray-900">Platform</h4>
             <ul className="mt-3 flex flex-col gap-2">

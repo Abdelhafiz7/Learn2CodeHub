@@ -25,7 +25,7 @@ export const VerifyEmailPage: React.FC = () => {
         const verify = async () => {
             try {
                 const res = await fetch(
-                    `https://localhost:5001/api/auth/verify-email?token=${token}`
+                    `${import.meta.env.VITE_API_URL}/auth/verify-email?token=${token}`
                 );
 
                 if (!res.ok) throw new Error();
@@ -51,7 +51,7 @@ export const VerifyEmailPage: React.FC = () => {
             }
 
             const res = await fetch(
-                "https://localhost:5001/api/auth/resend-verification",
+                `${import.meta.env.VITE_API_URL}/auth/resend-verification`,
                 {
                     method: "POST",
                     headers: {
@@ -80,7 +80,7 @@ export const VerifyEmailPage: React.FC = () => {
     return (
         <div className="flex w-full items-center justify-center p-4 md:p-12">
             <div className="w-full max-w-2xl bg-white dark:bg-[#1C1F26] border border-gray-200 dark:border-gray-800 rounded-[2.5rem] shadow-2xl p-10 md:p-16 relative z-10 transition-all duration-500 hover:shadow-indigo-500/5 animate-in fade-in slide-in-from-bottom-4">
-                
+
                 {success ? (
                     <div className="flex flex-col items-center text-center animate-in fade-in zoom-in duration-500">
                         <div className="w-20 h-20 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-full flex items-center justify-center mb-6 shadow-inner border border-emerald-100 dark:border-emerald-500/20">
@@ -90,7 +90,7 @@ export const VerifyEmailPage: React.FC = () => {
                         <p className="text-sm text-gray-500 dark:text-gray-400 mb-8 leading-relaxed">
                             Thank you for verifying your email address. Your account is now active and secure. Please sign in to access your dashboard.
                         </p>
-                        
+
                         <Button
                             className="w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl py-3 font-bold text-base shadow-lg shadow-indigo-500/25 transition-transform hover:scale-105 active:scale-95"
                             onClick={() => navigate("/login")}
@@ -107,7 +107,7 @@ export const VerifyEmailPage: React.FC = () => {
                         <p className="text-sm text-gray-500 dark:text-gray-400 mb-8 leading-relaxed">
                             The verification link you used is either invalid or has expired. If you need a new link, you can resend the verification email.
                         </p>
-                        
+
                         <div className="flex flex-col sm:flex-row gap-4 w-full justify-center">
                             <Button
                                 className="w-full sm:w-1/2 bg-gray-900 hover:bg-gray-800 dark:bg-white dark:hover:bg-gray-200 dark:text-gray-900 text-white rounded-xl py-3 font-bold shadow-lg transition-transform hover:scale-105 active:scale-95"
@@ -125,7 +125,7 @@ export const VerifyEmailPage: React.FC = () => {
                         </div>
                     </div>
                 )}
-                
+
             </div>
         </div>
     );

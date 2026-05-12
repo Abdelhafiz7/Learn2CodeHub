@@ -18,6 +18,9 @@ import { CourseCard } from '@/components/course';
 import { useApi } from '@/hooks';
 import { coursesApi } from '@/api';
 import { RecommendedCourses } from './RecommendedCourses';
+import photo1 from '@/assets/Photo1.png';
+import photo2 from '@/assets/Photo2.png';
+import photo3 from '@/assets/Photo3.png';
 
 const features = [
   {
@@ -61,7 +64,7 @@ const benefits = [
 const heroSlides = [
   {
     id: 1,
-    image: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80',
+    image: photo1,
     tag: 'Most Popular',
     title: 'Unlock Your',
     titleAccent: 'Potential',
@@ -71,7 +74,7 @@ const heroSlides = [
   },
   {
     id: 2,
-    image: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80',
+    image: photo2,
     tag: 'Trending Now',
     title: 'Master',
     titleAccent: 'Technology',
@@ -81,7 +84,7 @@ const heroSlides = [
   },
   {
     id: 3,
-    image: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80',
+    image: photo3,
     tag: 'New Paths',
     title: 'Advance',
     titleAccent: 'Your Career',
@@ -122,10 +125,8 @@ export const HomePage: React.FC = () => {
   return (
     <div className="bg-white dark:bg-gray-950 transition-colors duration-200">
 
-      {/* ─── Hero ─────────────────────────────────────────────────────────── */}
       <section className="relative w-full overflow-hidden bg-gray-950 min-h-[600px] md:min-h-[680px]">
 
-        {/* Background images */}
         {heroSlides.map((s, i) => (
           <div
             key={s.id}
@@ -136,17 +137,14 @@ export const HomePage: React.FC = () => {
               alt={s.title}
               className="h-full w-full object-cover object-center"
             />
-            {/* Layered overlays for depth */}
             <div className="absolute inset-0 bg-gradient-to-r from-gray-950/95 via-gray-950/70 to-gray-950/20" />
             <div className="absolute inset-0 bg-gradient-to-t from-gray-950/80 via-transparent to-transparent" />
           </div>
         ))}
 
-        {/* Content */}
         <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-full flex items-center">
           <div className="py-20 md:py-28 max-w-2xl">
 
-            {/* Tag pill */}
             <div
               className={`inline-flex items-center gap-2 rounded-full border border-indigo-500/40 bg-indigo-500/10 px-3 py-1.5 mb-6 transition-all duration-500 ${isTransitioning ? 'opacity-0 translate-y-2' : 'opacity-100 translate-y-0'}`}
             >
@@ -156,7 +154,6 @@ export const HomePage: React.FC = () => {
               </span>
             </div>
 
-            {/* Title */}
             <h1
               className={`text-5xl md:text-7xl font-black leading-none tracking-tight mb-6 transition-all duration-500 delay-75 ${isTransitioning ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'}`}
             >
@@ -166,14 +163,12 @@ export const HomePage: React.FC = () => {
               </span>
             </h1>
 
-            {/* Subtitle */}
             <p
               className={`text-lg text-gray-300 leading-relaxed mb-10 max-w-lg transition-all duration-500 delay-100 ${isTransitioning ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'}`}
             >
               {slide.subtitle}
             </p>
 
-            {/* CTAs */}
             <div
               className={`flex flex-wrap items-center gap-4 transition-all duration-500 delay-150 ${isTransitioning ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'}`}
             >
@@ -190,7 +185,6 @@ export const HomePage: React.FC = () => {
               </Link>
             </div>
 
-            {/* Social proof */}
             <div
               className={`mt-10 flex items-center gap-6 transition-all duration-500 delay-200 ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}
             >
@@ -203,7 +197,7 @@ export const HomePage: React.FC = () => {
               </div>
               <div>
                 <div className="flex items-center gap-1">
-                  {[1,2,3,4,5].map(s => (
+                  {[1, 2, 3, 4, 5].map(s => (
                     <Star key={s} className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" />
                   ))}
                   <span className="ml-1 text-sm font-bold text-white">4.9</span>
@@ -214,7 +208,6 @@ export const HomePage: React.FC = () => {
           </div>
         </div>
 
-        {/* Slide controls */}
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex items-center gap-4">
           <button
             onClick={prevSlide}
@@ -241,7 +234,6 @@ export const HomePage: React.FC = () => {
           </button>
         </div>
 
-        {/* Slide counter */}
         <div className="absolute top-8 right-8 z-20 hidden md:flex items-center gap-2">
           <span className="text-2xl font-black text-white">0{currentSlide + 1}</span>
           <div className="h-px w-8 bg-white/30" />
@@ -249,7 +241,6 @@ export const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* ─── Stats ────────────────────────────────────────────────────────── */}
       <section className="border-b border-gray-100 dark:border-gray-800/60 bg-white dark:bg-gray-950 py-10 transition-colors duration-200">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
@@ -268,7 +259,6 @@ export const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* ─── Featured Courses ─────────────────────────────────────────────── */}
       <section className="py-16 bg-white dark:bg-gray-950 transition-colors duration-200">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-10 flex items-end justify-between">
@@ -318,10 +308,8 @@ export const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* ─── Recommended ──────────────────────────────────────────────────── */}
       <RecommendedCourses />
 
-      {/* ─── Features ─────────────────────────────────────────────────────── */}
       <section className="bg-gray-50 dark:bg-gray-900/40 py-16 transition-colors duration-200">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-12 text-center">
@@ -347,7 +335,6 @@ export const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* ─── CTA ──────────────────────────────────────────────────────────── */}
       <section className="py-16 bg-white dark:bg-gray-950 transition-colors duration-200">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="relative overflow-hidden rounded-3xl bg-gray-950 dark:bg-gray-900 border border-gray-800 shadow-2xl">
@@ -388,7 +375,6 @@ export const HomePage: React.FC = () => {
                 </Link>
               </div>
 
-              {/* Right side decoration */}
               <div className="hidden md:flex md:justify-center md:items-center">
                 <div className="relative">
                   <div className="h-48 w-48 rounded-3xl bg-indigo-600/20 border border-indigo-500/20 flex items-center justify-center rotate-12">

@@ -5,6 +5,7 @@ using API.Data.Migrations;
 using API.Entities;
 using API.Enums;
 using API.Models;
+using API.Helpers;
 using API.Services;
 using CloudinaryDotNet.Actions;
 using Microsoft.AspNetCore.Authorization;
@@ -609,16 +610,7 @@ namespace API.Controllers
                     await emailService.SendEmailAsync(
                         user.Email,
                         "Your Account Has Been Deactivated",
-                        $"""
-                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                    <h2 style="color: #ef4444;">Account Deactivated</h2>
-                    <p>Hi {user.FirstName},</p>
-                    <p>Your account on <strong>Learn2CodeHub</strong> has been deactivated by an administrator.</p>
-                    <p>If you believe this was a mistake, please contact our support team.</p>
-                    <br/>
-                    <p style="color: #6b7280; font-size: 12px;">This is an automated message. Please do not reply.</p>
-                </div>
-                """
+                        EmailTemplates.GetAccountDeactivatedEmail(user.FirstName)
                     );
                 }
                 else
@@ -626,20 +618,7 @@ namespace API.Controllers
                     await emailService.SendEmailAsync(
                         user.Email,
                         "Your Account Has Been Reactivated",
-                        $"""
-                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                    <h2 style="color: #22c55e;">Account Reactivated ✅</h2>
-                    <p>Hi {user.FirstName},</p>
-                    <p>Great news! Your account on <strong>Learn2CodeHub</strong> has been reactivated.</p>
-                    <p>You can now log in and continue your learning journey.</p>
-                    <a href="http://localhost:5173/login" 
-                       style="display:inline-block;margin-top:16px;padding:12px 24px;background:#6366f1;color:white;border-radius:8px;text-decoration:none;font-weight:bold;">
-                       Log In Now
-                    </a>
-                    <br/><br/>
-                    <p style="color: #6b7280; font-size: 12px;">This is an automated message. Please do not reply.</p>
-                </div>
-                """
+                        EmailTemplates.GetAccountReactivatedEmail(user.FirstName)
                     );
                 }
             }

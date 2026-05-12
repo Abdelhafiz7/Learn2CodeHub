@@ -405,7 +405,16 @@ export const CourseDetailPage: React.FC = () => {
                     alt={course.title}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
                   />
-                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div
+                    className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                    onClick={() => {
+                      if (isEnrolled) {
+                        navigate(`/student/courses/${id}/learn`);
+                      } else {
+                        document.getElementById('curriculum')?.scrollIntoView({ behavior: 'smooth' });
+                      }
+                    }}
+                  >
                     <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-2xl shadow-white/20 transform scale-0 group-hover:scale-100 transition-transform duration-500">
                       <Play className="w-6 h-6 text-indigo-600 fill-indigo-600 translate-x-0.5" />
                     </div>
@@ -675,7 +684,7 @@ export const CourseDetailPage: React.FC = () => {
         {/* ─── REVIEWS SECTION ────────────────────────────────────────────── */}
         {/* ─── CURRICULUM SECTION ────────────────────────────────────────────── */}
         {course.sections && course.sections.length > 0 && (
-          <section className="mt-20 py-20 border-t border-gray-100 dark:border-gray-800">
+          <section id="curriculum" className="mt-20 py-20 border-t border-gray-100 dark:border-gray-800">
             <div className="max-w-5xl mx-auto space-y-8">
               <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
                 <div>

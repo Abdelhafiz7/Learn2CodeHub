@@ -71,6 +71,13 @@ export const AdminDashboard: React.FC = () => {
       color: 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800',
     },
     {
+      label: 'Manage Categories',
+      description: 'Add or edit course categories',
+      icon: <Tags className="h-5 w-5" />,
+      to: '/admin/categories',
+      color: 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800',
+    },
+    {
       label: 'Manage Courses',
       description: 'Review, publish or remove courses',
       icon: <BookOpen className="h-5 w-5" />,
@@ -90,13 +97,6 @@ export const AdminDashboard: React.FC = () => {
       icon: <BookX className="h-5 w-5" />,
       to: '/admin/courses?status=Draft',
       color: 'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-400 border-yellow-200 dark:border-yellow-800',
-    },
-    {
-      label: 'Manage Categories',
-      description: 'Add or edit course categories',
-      icon: <Tags className="h-5 w-5" />,
-      to: '/admin/categories',
-      color: 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800',
     },
     {
       label: 'Platform Analytics',
@@ -386,7 +386,7 @@ export const AdminDashboard: React.FC = () => {
 
       {/* ── CHARTS ──────────────────────────────────────────────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
+
         {/* Revenue Chart */}
         <div className="bg-white dark:bg-[#1C1F26] border border-gray-200 dark:border-gray-800 rounded-[2rem] p-6 md:p-8 shadow-xl relative overflow-hidden group hover:shadow-2xl transition-shadow duration-500">
           <div className="absolute top-0 right-0 w-48 h-48 bg-indigo-500/5 rounded-full blur-3xl group-hover:bg-indigo-500/10 transition-colors duration-700"></div>
@@ -404,13 +404,13 @@ export const AdminDashboard: React.FC = () => {
               <AreaChart data={analytics?.revenue || []} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#6366F1" stopOpacity={0.4}/>
-                    <stop offset="95%" stopColor="#6366F1" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="#6366F1" stopOpacity={0.4} />
+                    <stop offset="95%" stopColor="#6366F1" stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" opacity={0.15} />
                 <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: '#9CA3AF', fontSize: 11, fontWeight: 700 }} dy={10} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#9CA3AF', fontSize: 11, fontWeight: 700 }} tickFormatter={(val) => val >= 1000 ? `$${(val/1000).toFixed(1)}k` : `$${val}`} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#9CA3AF', fontSize: 11, fontWeight: 700 }} tickFormatter={(val) => val >= 1000 ? `$${(val / 1000).toFixed(1)}k` : `$${val}`} />
                 <Tooltip content={<CustomTooltip isCurrency />} cursor={{ stroke: '#6366F1', strokeWidth: 1, strokeDasharray: '4 4' }} />
                 <Area type="monotone" dataKey="value" stroke="#6366F1" strokeWidth={4} fillOpacity={1} fill="url(#colorRevenue)" animationDuration={1500} />
               </AreaChart>
@@ -435,8 +435,8 @@ export const AdminDashboard: React.FC = () => {
               <AreaChart data={analytics?.users || []} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorUsers" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#10B981" stopOpacity={0.4}/>
-                    <stop offset="95%" stopColor="#10B981" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="#10B981" stopOpacity={0.4} />
+                    <stop offset="95%" stopColor="#10B981" stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" opacity={0.15} />
@@ -466,8 +466,8 @@ export const AdminDashboard: React.FC = () => {
               <AreaChart data={analytics?.enrollment || []} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorEnrollments" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#F59E0B" stopOpacity={0.4}/>
-                    <stop offset="95%" stopColor="#F59E0B" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="#F59E0B" stopOpacity={0.4} />
+                    <stop offset="95%" stopColor="#F59E0B" stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" opacity={0.15} />
@@ -496,12 +496,11 @@ export const AdminDashboard: React.FC = () => {
             {topCourses?.map((course: any, idx: number) => (
               <div key={course.id} className="group/item flex justify-between items-center p-4 rounded-2xl bg-gray-50 dark:bg-[#181A20] border border-gray-100 dark:border-gray-800 hover:bg-white dark:hover:bg-[#242832] hover:border-emerald-200 dark:hover:border-emerald-500/30 hover:shadow-md transition-all cursor-pointer">
                 <div className="flex items-center gap-4">
-                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-xl shadow-inner group-hover/item:scale-110 transition-transform ${
-                    idx === 0 ? 'bg-gradient-to-br from-amber-100 to-amber-200 dark:from-amber-900/40 dark:to-amber-700/40 border border-amber-200 dark:border-amber-500/30' : 
-                    idx === 1 ? 'bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800/40 dark:to-slate-600/40 border border-slate-200 dark:border-slate-500/30' : 
-                    idx === 2 ? 'bg-gradient-to-br from-orange-100 to-orange-200 dark:from-orange-900/40 dark:to-orange-700/40 border border-orange-200 dark:border-orange-500/30' : 
-                    'bg-white dark:bg-[#181A20] text-sm font-black text-gray-400 shadow-sm'
-                  }`}>
+                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-xl shadow-inner group-hover/item:scale-110 transition-transform ${idx === 0 ? 'bg-gradient-to-br from-amber-100 to-amber-200 dark:from-amber-900/40 dark:to-amber-700/40 border border-amber-200 dark:border-amber-500/30' :
+                    idx === 1 ? 'bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800/40 dark:to-slate-600/40 border border-slate-200 dark:border-slate-500/30' :
+                      idx === 2 ? 'bg-gradient-to-br from-orange-100 to-orange-200 dark:from-orange-900/40 dark:to-orange-700/40 border border-orange-200 dark:border-orange-500/30' :
+                        'bg-white dark:bg-[#181A20] text-sm font-black text-gray-400 shadow-sm'
+                    }`}>
                     {idx === 0 ? "🥇" : idx === 1 ? "🥈" : idx === 2 ? "🥉" : `#${idx + 1}`}
                   </div>
                   <div>
@@ -681,12 +680,11 @@ export const AdminDashboard: React.FC = () => {
             {topInstructors?.map((inst: any, index: number) => (
               <div key={inst.id} className="group/item flex items-center justify-between p-4 rounded-2xl bg-gray-50 dark:bg-[#181A20] border border-gray-100 dark:border-gray-800 hover:bg-white dark:hover:bg-[#242832] hover:border-purple-200 dark:hover:border-purple-500/30 hover:shadow-md transition-all cursor-pointer">
                 <div className="flex items-center gap-4">
-                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-xl shadow-inner group-hover/item:scale-110 transition-transform ${
-                    index === 0 ? 'bg-gradient-to-br from-amber-100 to-amber-200 dark:from-amber-900/40 dark:to-amber-700/40 border border-amber-200 dark:border-amber-500/30' : 
-                    index === 1 ? 'bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800/40 dark:to-slate-600/40 border border-slate-200 dark:border-slate-500/30' : 
-                    index === 2 ? 'bg-gradient-to-br from-orange-100 to-orange-200 dark:from-orange-900/40 dark:to-orange-700/40 border border-orange-200 dark:border-orange-500/30' : 
-                    'bg-white dark:bg-[#181A20] text-sm font-black text-gray-400 shadow-sm'
-                  }`}>
+                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-xl shadow-inner group-hover/item:scale-110 transition-transform ${index === 0 ? 'bg-gradient-to-br from-amber-100 to-amber-200 dark:from-amber-900/40 dark:to-amber-700/40 border border-amber-200 dark:border-amber-500/30' :
+                    index === 1 ? 'bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800/40 dark:to-slate-600/40 border border-slate-200 dark:border-slate-500/30' :
+                      index === 2 ? 'bg-gradient-to-br from-orange-100 to-orange-200 dark:from-orange-900/40 dark:to-orange-700/40 border border-orange-200 dark:border-orange-500/30' :
+                        'bg-white dark:bg-[#181A20] text-sm font-black text-gray-400 shadow-sm'
+                    }`}>
                     {index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : `#${index + 1}`}
                   </div>
                   <div>

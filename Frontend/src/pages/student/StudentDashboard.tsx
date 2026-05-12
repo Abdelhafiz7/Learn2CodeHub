@@ -52,7 +52,7 @@ export const StudentDashboard: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-8 w-full p-4 md:p-6 lg:p-8">
-      
+
       {/* HEADER */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white dark:bg-[#1C1F26] p-6 rounded-[2rem] border border-gray-200 dark:border-gray-800 shadow-sm">
         <div className="flex items-center gap-5">
@@ -100,7 +100,7 @@ export const StudentDashboard: React.FC = () => {
 
           {/* Floating Glassmorphism Accents */}
           <div className="absolute top-8 right-8 w-32 h-32 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 transform rotate-12 group-hover:rotate-45 group-hover:bg-white/20 transition-all duration-700 pointer-events-none"></div>
-          
+
           <div className="relative z-10 h-full flex flex-col justify-between">
             <div>
               <div className="flex items-center gap-2 text-orange-100 font-bold uppercase tracking-wider mb-2 text-sm">
@@ -224,7 +224,7 @@ export const StudentDashboard: React.FC = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 {inProgress.slice(0, 4).map((enrollment) => (
                   <div key={enrollment.id} className="group relative bg-white dark:bg-[#1C1F26] border border-gray-200 dark:border-gray-800 rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
-                    
+
                     {/* Thumbnail Header */}
                     <div className="relative h-48 bg-gray-100 dark:bg-gray-800 overflow-hidden">
                       {enrollment.course?.thumbnailUrl ? (

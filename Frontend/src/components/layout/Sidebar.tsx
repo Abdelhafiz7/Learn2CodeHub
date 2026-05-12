@@ -79,8 +79,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed = false, onToggle })
     { label: 'Manage Courses',    to: '/admin/courses',          icon: <GraduationCap className="h-5 w-5" /> },
     { label: 'Pending Approvals', to: '/admin/pending-courses',  icon: <ClipboardCheck className="h-5 w-5" />, badge: pendingCount },
     { label: 'Manage Categories', to: '/admin/categories',       icon: <BookOpen className="h-5 w-5" /> },
-    { label: 'Analytics',         to: '/admin/analytics',        icon: <BarChart3 className="h-5 w-5" /> },
-    { label: 'Settings',          to: '/admin/settings',         icon: <Settings className="h-5 w-5" /> },
   ];
 
   const navItems =

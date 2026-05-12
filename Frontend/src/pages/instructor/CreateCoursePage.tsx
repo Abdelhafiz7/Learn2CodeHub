@@ -11,7 +11,10 @@ import {
   Image as ImageIcon,
   AlignLeft,
   Settings,
-  Eye
+  Eye,
+  Upload,
+  X,
+  Loader2,
 } from 'lucide-react';
 import { Button, Input, Select, Textarea } from '@/components/ui';
 import { coursesApi } from '@/api';
@@ -36,7 +39,8 @@ export const CreateCoursePage: React.FC = () => {
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
-
+  const [thumbnailPreview, setThumbnailPreview] = useState<string>('');
+  const [isUploadingThumbnail, setIsUploadingThumbnail] = useState(false);
   const [formData, setFormData] = useState<CreateCourseRequest>({
     title: '',
     description: '',
@@ -85,6 +89,33 @@ export const CreateCoursePage: React.FC = () => {
     }
   };
 
+  const handleThumbnailChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const objectUrl = URL.createObjectURL(file);
+    setThumbnailPreview(objectUrl);
+    setIsUploadingThumbnail(true);
+
+    try {
+      const url = await coursesApi.uploadCourseImage(file);
+      setFormData((prev) => ({ ...prev, thumbnailUrl: url }));
+      toast.success('Thumbnail uploaded!');
+    } catch (err) {
+      toast.error('Thumbnail upload failed. Please try again.');
+      setThumbnailPreview('');
+      setFormData((prev) => ({ ...prev, thumbnailUrl: '' }));
+    } finally {
+      setIsUploadingThumbnail(false);
+      URL.revokeObjectURL(objectUrl);
+    }
+  };
+
+  const handleRemoveThumbnail = () => {
+    setThumbnailPreview('');
+    setFormData((prev) => ({ ...prev, thumbnailUrl: '' }));
+  };
+
   const validateStep = (s: number): boolean => {
     const newErrors: typeof errors = {};
     if (s === 1) {
@@ -123,11 +154,17 @@ export const CreateCoursePage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateStep(3)) return;
+
+    if (isUploadingThumbnail) {
+      toast.error('Please wait for the thumbnail to finish uploading.');
+      return;
+    }
+
     setIsSubmitting(true);
-    
+
     const apiPayload = {
       ...formData,
-      categoryId: Number(formData.categoryId)
+      categoryId: Number(formData.categoryId),
     };
 
     try {
@@ -144,7 +181,6 @@ export const CreateCoursePage: React.FC = () => {
   return (
     <div className="flex flex-col gap-8 w-full p-4 md:p-6 lg:p-8">
       
-      {/* HEADER */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white dark:bg-[#1C1F26] p-6 rounded-[2rem] border border-gray-200 dark:border-gray-800 shadow-sm">
         <div className="flex items-center gap-5">
           <div className="w-14 h-14 rounded-2xl bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0 shadow-sm">
@@ -163,13 +199,11 @@ export const CreateCoursePage: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         
-        {/* SIDEBAR: STEP INDICATOR */}
         <div className="lg:col-span-4 xl:col-span-3">
           <div className="bg-white dark:bg-[#1C1F26] border border-gray-200 dark:border-gray-800 rounded-[2rem] p-6 shadow-lg sticky top-24">
             <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-6">Course Creation</h3>
             
             <div className="flex flex-col gap-6 relative">
-              {/* Vertical Connecting Line */}
               <div className="absolute left-6 top-6 bottom-6 w-0.5 bg-gray-100 dark:bg-gray-800 -z-10 rounded-full" />
 
               {steps.map((s) => {
@@ -209,11 +243,9 @@ export const CreateCoursePage: React.FC = () => {
           </div>
         </div>
 
-        {/* MAIN FORM */}
         <div className="lg:col-span-8 xl:col-span-9">
           <form onSubmit={handleSubmit} className="bg-white dark:bg-[#1C1F26] border border-gray-200 dark:border-gray-800 rounded-[2rem] p-6 sm:p-10 shadow-xl dark:shadow-2xl">
             
-            {/* ─── Step 1: Basic Info ──────────────────────────────────────── */}
             {step === 1 && (
               <div className="flex flex-col gap-8 animate-in fade-in slide-in-from-right-4 duration-500">
                 
@@ -230,6 +262,7 @@ export const CreateCoursePage: React.FC = () => {
                 </div>
 
                 <div className="space-y-6">
+                  {/* Title */}
                   <div>
                     <label className="flex items-center gap-2 text-sm font-bold text-gray-900 dark:text-white mb-2">
                       <Type className="w-4 h-4 text-gray-400" /> Course Title
@@ -264,33 +297,90 @@ export const CreateCoursePage: React.FC = () => {
 
                   <div>
                     <label className="flex items-center gap-2 text-sm font-bold text-gray-900 dark:text-white mb-2">
-                      <ImageIcon className="w-4 h-4 text-gray-400" /> Thumbnail URL
+                      <ImageIcon className="w-4 h-4 text-gray-400" /> Course Thumbnail
                     </label>
-                    <Input
-                      name="thumbnailUrl"
-                      value={formData.thumbnailUrl || ''}
-                      onChange={handleChange}
-                      placeholder="https://example.com/thumbnail.jpg"
-                      className="bg-gray-50 dark:bg-[#13151A] border-gray-200 dark:border-gray-800 focus:bg-white dark:focus:bg-[#1C1F26]"
-                    />
-                    <p className="text-xs text-gray-500 mt-2">Recommended: 1280x720 pixels (16:9 ratio).</p>
-                    
-                    {formData.thumbnailUrl && (
-                      <div className="mt-4 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-800 max-w-sm">
-                        <img 
-                          src={formData.thumbnailUrl} 
-                          alt="Thumbnail Preview" 
-                          className="w-full h-auto aspect-video object-cover"
-                          onError={(e) => (e.currentTarget.src = 'https://placehold.co/1280x720?text=Invalid+Image+URL')}
-                        />
-                      </div>
+
+                    <label className={`relative flex flex-col items-center justify-center w-full h-52 border-2 border-dashed rounded-2xl cursor-pointer transition-colors overflow-hidden group
+                      ${isUploadingThumbnail
+                        ? 'border-indigo-400 bg-indigo-50 dark:bg-indigo-500/10'
+                        : thumbnailPreview || formData.thumbnailUrl
+                          ? 'border-transparent'
+                          : 'border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-[#13151A] hover:bg-gray-100 dark:hover:bg-[#181A20]'
+                      }`}
+                    >
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleThumbnailChange}
+                        disabled={isUploadingThumbnail}
+                      />
+
+                      {isUploadingThumbnail && (
+                        <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-indigo-50 dark:bg-indigo-500/10 z-10">
+                          {thumbnailPreview && (
+                            <img
+                              src={thumbnailPreview}
+                              alt="Preview"
+                              className="absolute inset-0 w-full h-full object-cover opacity-30"
+                            />
+                          )}
+                          <Loader2 className="w-8 h-8 text-indigo-600 animate-spin relative z-10" />
+                          <p className="text-sm font-semibold text-indigo-600 dark:text-indigo-400 relative z-10 animate-pulse">
+                            Uploading to Cloudinary...
+                          </p>
+                        </div>
+                      )}
+
+                      {!isUploadingThumbnail && (thumbnailPreview || formData.thumbnailUrl) && (
+                        <>
+                          <img
+                            src={formData.thumbnailUrl || thumbnailPreview}
+                            alt="Thumbnail preview"
+                            className="w-full h-full object-cover"
+                          />
+                          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center gap-2 transition-opacity">
+                            <Upload className="w-6 h-6 text-white" />
+                            <p className="text-white text-sm font-semibold">Click to change</p>
+                          </div>
+                        </>
+                      )}
+
+                      {!isUploadingThumbnail && !thumbnailPreview && !formData.thumbnailUrl && (
+                        <div className="flex flex-col items-center gap-3 text-gray-400 group-hover:text-indigo-500 transition-colors px-4 text-center">
+                          <div className="w-14 h-14 rounded-2xl bg-gray-100 dark:bg-gray-800 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-500/20 flex items-center justify-center transition-colors">
+                            <Upload className="w-7 h-7" />
+                          </div>
+                          <div>
+                            <p className="text-sm font-semibold">Click to upload thumbnail</p>
+                            <p className="text-xs mt-1">PNG, JPG, WEBP — 1280×720 recommended</p>
+                          </div>
+                        </div>
+                      )}
+                    </label>
+
+                    {!isUploadingThumbnail && (thumbnailPreview || formData.thumbnailUrl) && (
+                      <button
+                        type="button"
+                        onClick={handleRemoveThumbnail}
+                        className="mt-2 flex items-center gap-1.5 text-xs text-red-500 hover:text-red-700 font-medium transition-colors"
+                      >
+                        <X className="w-3.5 h-3.5" /> Remove thumbnail
+                      </button>
                     )}
+
+                    {formData.thumbnailUrl && !isUploadingThumbnail && (
+                      <p className="mt-2 flex items-center gap-1.5 text-xs text-emerald-600 dark:text-emerald-400 font-medium">
+                        <Check className="w-3.5 h-3.5" /> Uploaded to Cloudinary
+                      </p>
+                    )}
+
+                    <p className="text-xs text-gray-500 mt-2">Optional — you can add this later from the course editor.</p>
                   </div>
                 </div>
               </div>
             )}
 
-            {/* ─── Step 2: Details ─────────────────────────────────────────── */}
             {step === 2 && (
               <div className="flex flex-col gap-8 animate-in fade-in slide-in-from-right-4 duration-500">
                 
@@ -343,31 +433,37 @@ export const CreateCoursePage: React.FC = () => {
               </div>
             )}
 
-            {/* ─── Step 3: Pricing ─────────────────────────────────────────── */}
             {step === 3 && (
               <div className="flex flex-col gap-8 animate-in fade-in slide-in-from-right-4 duration-500">
                 
-                {/* PREVIEW CARD */}
-                <div className="rounded-2xl border border-gray-200 dark:border-gray-800 p-6 bg-gradient-to-br from-gray-50 to-white dark:from-[#13151A] dark:to-[#1C1F26] shadow-sm">
-                  <div className="flex items-center gap-2 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider mb-3">
-                    <Eye className="w-4 h-4" /> Course Preview
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{formData.title}</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">{formData.shortDescription}</p>
-                  
-                  <div className="flex items-center gap-3">
-                    <span className="bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-xs font-bold px-3 py-1 rounded-md">
-                      {formData.level}
-                    </span>
-                    {formData.categoryId && (
-                      <span className="bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 text-xs font-bold px-3 py-1 rounded-md">
-                        {categories.find(c => String(c.id) === formData.categoryId)?.name || 'Category'}
+                <div className="rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden bg-gradient-to-br from-gray-50 to-white dark:from-[#13151A] dark:to-[#1C1F26] shadow-sm">
+                  {formData.thumbnailUrl && (
+                    <img
+                      src={formData.thumbnailUrl}
+                      alt="Course thumbnail"
+                      className="w-full h-40 object-cover"
+                    />
+                  )}
+                  <div className="p-6">
+                    <div className="flex items-center gap-2 text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider mb-3">
+                      <Eye className="w-4 h-4" /> Course Preview
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{formData.title}</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">{formData.shortDescription}</p>
+                    
+                    <div className="flex items-center gap-3">
+                      <span className="bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-xs font-bold px-3 py-1 rounded-md">
+                        {formData.level}
                       </span>
-                    )}
+                      {formData.categoryId && (
+                        <span className="bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 text-xs font-bold px-3 py-1 rounded-md">
+                          {categories.find(c => String(c.id) === formData.categoryId)?.name || 'Category'}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
 
-                {/* PRICING INPUT */}
                 <div>
                   <label className="flex items-center gap-2 text-sm font-bold text-gray-900 dark:text-white mb-2">
                     <DollarSign className="w-4 h-4 text-gray-400" /> Course Price (USD)
@@ -390,7 +486,6 @@ export const CreateCoursePage: React.FC = () => {
                   {errors.price && <p className="mt-1 text-sm text-red-500 font-medium">{errors.price}</p>}
                 </div>
 
-                {/* QUICK SELECT TILES */}
                 <div>
                   <p className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-3">Quick Price Select</p>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -426,7 +521,6 @@ export const CreateCoursePage: React.FC = () => {
               </div>
             )}
 
-            {/* ─── FOOTER ACTIONS ────────────────────────────────────────── */}
             <div className="mt-10 pt-6 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between">
               <button
                 type="button"
@@ -444,11 +538,16 @@ export const CreateCoursePage: React.FC = () => {
                     onClick={handleNext}
                     disabled={
                       (step === 1 && (!formData.title || !formData.shortDescription)) ||
-                      (step === 2 && (!formData.description || !formData.categoryId))
+                      (step === 2 && (!formData.description || !formData.categoryId)) ||
+                      isUploadingThumbnail
                     }
                     className="flex items-center gap-2 px-8 py-3 rounded-xl font-bold text-white bg-gray-900 dark:bg-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-lg"
                   >
-                    Next Step <ChevronRight className="w-4 h-4" />
+                    {isUploadingThumbnail ? (
+                      <><Loader2 className="w-4 h-4 animate-spin" /> Uploading...</>
+                    ) : (
+                      <>Next Step <ChevronRight className="w-4 h-4" /></>
+                    )}
                   </button>
                 ) : (
                   <button 
@@ -457,7 +556,7 @@ export const CreateCoursePage: React.FC = () => {
                     className="flex items-center gap-2 px-8 py-3 rounded-xl font-bold text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-70 disabled:cursor-wait transition-colors shadow-xl shadow-indigo-500/20"
                   >
                     {isSubmitting ? (
-                      <>Processing...</>
+                      <><Loader2 className="w-4 h-4 animate-spin" /> Processing...</>
                     ) : (
                       <>Publish Draft <Check className="w-5 h-5" /></>
                     )}

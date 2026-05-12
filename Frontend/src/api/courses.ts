@@ -129,6 +129,27 @@ export const coursesApi = {
     return response.data;
   },
 
+  // Add to coursesApi
+  uploadCourseImage: async (file: File): Promise<string> => {
+    const formData = new FormData();
+    formData.append('file', file); // key must match IFormFile parameter name
+
+    const response = await axiosInstance.post<{ url: string }>('/courses/upload/image', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return response.data.url;
+  },
+
+  uploadCourseThumbnail: async (courseId: number, file: File): Promise<string> => {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const response = await axiosInstance.post<{ url: string }>(`/courses/${courseId}/thumbnail`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return response.data.url;
+  },
+
   createCourse: async (data: CreateCourseRequest): Promise<Course> => {
     const response = await axiosInstance.post<Course>('/courses', data);
     return response.data;
@@ -166,7 +187,7 @@ export const coursesApi = {
   },
 
   adminDeleteCourse: async (id: string): Promise<void> => {
-    await axiosInstance.delete(`/dashboard/admin/courses/${id}`);
+    await axiosInstance.delete(`/courses/${id}`);
   },
 
   adminUpdateCourseStatus: async (id: string, status: string) => {

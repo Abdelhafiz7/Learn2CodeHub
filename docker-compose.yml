@@ -1,17 +1,18 @@
-version: '3.8'
-
 services:
   api:
     build:
       context: ./API
       dockerfile: Dockerfile
+
     ports:
       - "5000:8080"
+
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Data Source=/app/db/LearnToCode.db
-    # volumes:
-    #   - sqlite_data:/app/db
+
+    volumes:
+      - ./API/LearnToCode.db:/app/db/LearnToCode.db
 
   frontend:
     build:
@@ -19,10 +20,9 @@ services:
       dockerfile: Dockerfile
       args:
         - VITE_API_URL=http://localhost:5000/api
+
     ports:
       - "5173:80"
+
     depends_on:
       - api
-
-# volumes:
-#   sqlite_data:

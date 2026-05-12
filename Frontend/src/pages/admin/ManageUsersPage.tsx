@@ -171,10 +171,9 @@ export const ManageUsersPage: React.FC = () => {
     try {
       setDeleteLoading(true);
       await adminApi.deleteUser(deleteTarget.id);
-      setUsers(prev => prev.filter(u => u.id !== deleteTarget.id));
-      setTotalCount(prev => prev - 1);
       toast.success(`${deleteTarget.firstName} has been deleted`, { icon: '🗑️' });
       setDeleteTarget(null);
+      await fetchUsers(); // ← refetch instead of manually filtering
     } catch {
       toast.error('Failed to delete user');
     } finally {
@@ -182,7 +181,6 @@ export const ManageUsersPage: React.FC = () => {
     }
   };
 
-  // Client-side role + verified filter (search is now handled by backend)
   const filtered = users.filter(u => {
     const matchRole = !roleFilter || u.role === roleFilter;
     const matchVerified =
@@ -282,11 +280,10 @@ export const ManageUsersPage: React.FC = () => {
               <button
                 key={role.value}
                 onClick={() => setRoleFilter(role.value)}
-                className={`relative flex items-center justify-center gap-2 flex-1 xl:flex-none px-4 lg:px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-500 ease-out z-10 ${
-                  isActive
+                className={`relative flex items-center justify-center gap-2 flex-1 xl:flex-none px-4 lg:px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-500 ease-out z-10 ${isActive
                     ? 'text-indigo-700 dark:text-indigo-300'
                     : 'text-gray-500 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200/50 dark:hover:bg-gray-800/50'
-                }`}
+                  }`}
               >
                 {isActive && (
                   <div className="absolute inset-0 bg-white dark:bg-[#1C1F26] rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.2)] border border-gray-100 dark:border-gray-700/50 -z-10" />
@@ -311,11 +308,10 @@ export const ManageUsersPage: React.FC = () => {
               <button
                 key={v.value}
                 onClick={() => setVerifiedFilter(v.value)}
-                className={`relative flex items-center justify-center gap-2 flex-1 xl:flex-none px-4 lg:px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-500 ease-out z-10 ${
-                  isActive
+                className={`relative flex items-center justify-center gap-2 flex-1 xl:flex-none px-4 lg:px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-500 ease-out z-10 ${isActive
                     ? v.value === 'verified' ? 'text-emerald-700 dark:text-emerald-400' : v.value === 'unverified' ? 'text-amber-700 dark:text-amber-400' : 'text-indigo-700 dark:text-indigo-300'
                     : 'text-gray-500 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200/50 dark:hover:bg-gray-800/50'
-                }`}
+                  }`}
               >
                 {isActive && (
                   <div className="absolute inset-0 bg-white dark:bg-[#1C1F26] rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.2)] border border-gray-100 dark:border-gray-700/50 -z-10" />
@@ -456,12 +452,12 @@ export const ManageUsersPage: React.FC = () => {
                       {openRoleMenu === user.id && (
                         <div className="absolute right-0 top-14 z-50 w-72 bg-white/95 dark:bg-[#181A20]/95 backdrop-blur-2xl border border-white/50 dark:border-gray-700/50 rounded-[2rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] p-2.5 animate-in fade-in slide-in-from-top-4 duration-300">
                           <div className="px-4 pt-3 pb-3 flex items-center justify-between border-b border-gray-100 dark:border-gray-800">
-                             <span className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Assign Role</span>
-                             <div className="flex gap-1">
-                                <div className="w-1.5 h-1.5 rounded-full bg-red-400"></div>
-                                <div className="w-1.5 h-1.5 rounded-full bg-amber-400"></div>
-                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-400"></div>
-                             </div>
+                            <span className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Assign Role</span>
+                            <div className="flex gap-1">
+                              <div className="w-1.5 h-1.5 rounded-full bg-red-400"></div>
+                              <div className="w-1.5 h-1.5 rounded-full bg-amber-400"></div>
+                              <div className="w-1.5 h-1.5 rounded-full bg-emerald-400"></div>
+                            </div>
                           </div>
                           <div className="flex flex-col gap-1 mt-2">
                             {ROLES.map(role => {
@@ -476,8 +472,8 @@ export const ManageUsersPage: React.FC = () => {
                                   key={role}
                                   onClick={() => handleChangeRole(user, role)}
                                   className={`flex items-center gap-4 p-3 w-full rounded-2xl transition-all duration-300 group
-                                    ${isCurrent 
-                                      ? 'bg-indigo-600 shadow-xl shadow-indigo-500/30 text-white translate-x-1' 
+                                    ${isCurrent
+                                      ? 'bg-indigo-600 shadow-xl shadow-indigo-500/30 text-white translate-x-1'
                                       : 'hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 hover:translate-x-1'}`}
                                 >
                                   <div className={`w-11 h-11 rounded-[14px] flex items-center justify-center shrink-0 transition-all duration-500 ${isCurrent ? 'bg-white/20 text-white shadow-inner' : 'bg-gray-100 dark:bg-gray-900 text-gray-400 group-hover:text-indigo-500 group-hover:bg-indigo-50 dark:group-hover:bg-indigo-500/10'}`}>

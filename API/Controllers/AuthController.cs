@@ -8,6 +8,7 @@ using API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using API.Helpers;
 
 namespace API.Controllers
 {
@@ -34,7 +35,10 @@ namespace API.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var exists = await _context.Users.AnyAsync(u => u.Email == registerDto.Email);
+            var exists = await _context.Users
+    .AnyAsync(u =>
+        u.Email == registerDto.Email &&
+        !u.IsDeleted);
             if (exists)
                 return BadRequest("Email already in use");
 
@@ -60,7 +64,7 @@ namespace API.Controllers
             await _emailService.SendEmailAsync(
                 user.Email,
                 "Verify Your Email",
-                $"<h3>Click to verify your account:</h3><a href='{link}'>Verify Email</a>"
+                EmailTemplates.GetVerificationEmail(user.FirstName, link)
             );
 
             var jwtToken = _jwtService.GenerateToken(user.Id, user.Email, user.Role);
@@ -77,8 +81,9 @@ namespace API.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginDto loginDto)
         {
-            var user = await _context.Users.FirstOrDefaultAsync
-                (x => x.Email == loginDto.Email);
+            var user = await _context.Users.FirstOrDefaultAsync(x =>
+    x.Email == loginDto.Email &&
+    !x.IsDeleted);
 
             if (user == null)
                 return Unauthorized("Invalid email or password");
@@ -125,8 +130,8 @@ namespace API.Controllers
 
             var user = await _context.Users.FindAsync(int.Parse(userIdClaim));
 
-            if (user == null)
-                return Unauthorized("User not found");
+            if (user.IsDeleted)
+                return Unauthorized("Account deleted");
 
             return Ok(new
             {
@@ -236,7 +241,9 @@ namespace API.Controllers
         [HttpPost("forgot-password")]
         public async Task<IActionResult> ForgetPassword([FromBody] string email)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == email);
+            var user = await _context.Users.FirstOrDefaultAsync(x =>
+    x.Email == email &&
+    !x.IsDeleted);
 
             if (user == null)
                 return Ok();
@@ -251,7 +258,7 @@ namespace API.Controllers
             await _emailService.SendEmailAsync(
                 user.Email,
                 "Reset Your Password",
-                $"<h3>Click to reset password:</h3><a href='{link}'>Reset Password</a>"
+                EmailTemplates.GetForgotPasswordEmail(user.FirstName, link)
             );
 
             await _context.SaveChangesAsync();
@@ -311,7 +318,9 @@ namespace API.Controllers
         [HttpPost("resend-verification")]
         public async Task<IActionResult> ResendVerificationEmail([FromBody] string email)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == email);
+            var user = await _context.Users.FirstOrDefaultAsync(x =>
+    x.Email == email &&
+    !x.IsDeleted);
 
             if (user == null || user.EmailConfirmed)
                 return Ok();
@@ -328,7 +337,7 @@ namespace API.Controllers
             await _emailService.SendEmailAsync(
                 user.Email,
                 "Verify Your Email",
-                $"<h3>Click to verify your account:</h3><a href='{link}'>Verify Email</a>"
+                EmailTemplates.GetVerificationEmail(user.FirstName, link)
             );
 
             return Ok();
@@ -344,7 +353,9 @@ namespace API.Controllers
             if (user == null)
                 return NotFound();
 
-            if (await _context.Users.AnyAsync(x => x.Email == newEmail))
+            if (await _context.Users.AnyAsync(x =>
+    x.Email == newEmail &&
+    !x.IsDeleted))
                 return BadRequest("Email already in use");
 
             var token = Guid.NewGuid().ToString();
@@ -360,7 +371,7 @@ namespace API.Controllers
             await _emailService.SendEmailAsync(
                 newEmail,
                 "Confirm Your Email Change",
-                $"<a href='{link}'>Confirm Email Change</a>"
+                EmailTemplates.GetEmailChangeEmail(user.FirstName, link)
             );
             return Ok();
         }

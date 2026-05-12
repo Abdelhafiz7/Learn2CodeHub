@@ -16,6 +16,7 @@ public class User
     public string? ProfileImageUrl { get; set; }
     public bool isActive { get; set; } = true;
     public DateTime CreateAt { get; set; } = DateTime.UtcNow;
+    public bool IsDeleted { get; set; } = false;
 
     // Email Verification
     public bool EmailConfirmed { get; set; } = false;
@@ -43,5 +44,9 @@ public class User
     public ICollection<Enrollment> Enrollments { get; set; } = new List<Enrollment>();
     public ICollection<LessonProgress> LessonProgresses { get; set; } = new List<LessonProgress>();
     public ICollection<Review> Reviews { get; set; } = new List<Review>();
+    public ICollection<Wishlist> Wishlists { get; set; } = new List<Wishlist>();
+    public ICollection<LearningActivity> LearningActivities { get; set; } = new List<LearningActivity>();
+    public ICollection<Notes> LessonNotes { get; set; } = new List<Notes>();
+    public ICollection<UserSearchHistory> UserSearchHistories { get; set; } = new List<UserSearchHistory>();
 
 }

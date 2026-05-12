@@ -4,6 +4,7 @@ using API.Data;
 using API.Entities;
 using API.Enums;
 using API.Models;
+using API.Services;
 using Humanizer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -15,8 +16,11 @@ namespace API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CoursesController(WebContext context) : ControllerBase
+    public class CoursesController(WebContext context, CloudinaryService cloudinaryService) : ControllerBase
     {
+        private readonly CloudinaryService _cloudinaryService = cloudinaryService;
+
+
         [HttpGet]
         public async Task<ActionResult<PagedResultDto<Course>>> GetCourses([FromQuery] QueryDto queryDto)
         {
@@ -43,12 +47,12 @@ namespace API.Controllers
 
                     var recentlySarched = await context.UserSearchHistories
                         .AnyAsync(h => h.UserId == userId &&
-                                  h.SearchTerm.ToLower() == search && 
+                                  h.SearchTerm.ToLower() == search &&
                                   h.SearchedAt > DateTime.UtcNow.AddHours(-1));
 
                     if (!recentlySarched)
                     {
-                        context.UserSearchHistories.Add( new UserSearchHistory
+                        context.UserSearchHistories.Add(new UserSearchHistory
                         {
                             UserId = userId,
                             SearchTerm = search,
@@ -677,7 +681,7 @@ namespace API.Controllers
 
             if (!recommendations.Any())
             {
-                recommendations = await context.Courses 
+                recommendations = await context.Courses
                     .Where(c => c.IsPublished && !enrolledIds.Contains(c.Id))
                     .Include(c => c.Reviews)
                     .Include(c => c.Enrollments)
@@ -709,6 +713,39 @@ namespace API.Controllers
             }
 
             return Ok(recommendations);
+        }
+
+        [HttpPost("{id}/thumbnail")]
+        [Authorize(Roles = "Admin, Instructor")]
+        public async Task<ActionResult> UploadThumbnail(int id, IFormFile file)
+        {
+            var course = await context.Courses.FindAsync(id);
+            if (course == null)
+                return NotFound("Course not found");
+
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var role = User.FindFirst(ClaimTypes.Role)!.Value;
+
+            if (course.InstructorId != userId && role != "Admin")
+                return StatusCode(403, "You are not allowed to upload thumbnail for this course");
+
+            if (file == null || file.Length == 0)
+                return BadRequest("No file provided");
+
+            var url = await _cloudinaryService.UploadImageAsync(file);
+
+            return Ok(new { url });
+        }
+
+        [HttpPost("upload/image")]
+        [Authorize(Roles = "Admin, Instructor")]
+        public async Task<ActionResult> UploadImage(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest("No file provided");
+
+            var url = await _cloudinaryService.UploadImageAsync(file);
+            return Ok(new { url });
         }
 
     }

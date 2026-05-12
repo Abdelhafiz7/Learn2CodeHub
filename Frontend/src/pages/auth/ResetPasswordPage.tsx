@@ -62,7 +62,7 @@ export const ResetPasswordPage: React.FC = () => {
   return (
     <div className="flex w-full items-center justify-center p-4 md:p-12">
       <div className="w-full max-w-2xl bg-white dark:bg-[#1C1F26] border border-gray-200 dark:border-gray-800 rounded-[2.5rem] shadow-2xl p-10 md:p-16 relative z-10 transition-all duration-500 hover:shadow-indigo-500/5">
-        
+
         {success ? (
           <div className="flex flex-col items-center text-center animate-in fade-in zoom-in duration-500">
             <div className="w-20 h-20 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-full flex items-center justify-center mb-6 shadow-inner border border-emerald-100 dark:border-emerald-500/20">
@@ -84,7 +84,7 @@ export const ResetPasswordPage: React.FC = () => {
             <div className="w-16 h-16 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-2xl flex items-center justify-center mb-8 shadow-sm border border-indigo-100 dark:border-indigo-500/20">
               <KeyRound className="w-8 h-8" />
             </div>
-            
+
             <h1 className="text-[1.75rem] font-bold text-gray-900 dark:text-white mb-3 tracking-tight">Create new p assword</h1>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-8 leading-relaxed">
               Your new password must be uniquely yours. Please enter a strong password with at least 6 characters.
@@ -122,8 +122,8 @@ export const ResetPasswordPage: React.FC = () => {
               Reset Password
             </Button>
 
-            <Link 
-              to="/login" 
+            <Link
+              to="/login"
               className="flex items-center justify-center gap-2 text-sm font-medium text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors group"
             >
               <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />

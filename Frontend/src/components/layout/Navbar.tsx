@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   BookOpen, Menu, X, ChevronDown, LogOut, User, LayoutDashboard,
-  Sun, Moon, ChevronRight, Monitor, Network, Briefcase, ArrowRight,
+  Sun, Moon, ChevronRight, ArrowRight,
   Search, Sparkles
 } from 'lucide-react';
 import { useAuthStore, useThemeStore, useCourseStore } from '@/store';
@@ -17,7 +17,7 @@ import { CATEGORY_ICONS } from '@/categoryIcons';
 export const Navbar: React.FC = () => {
   const { user, isAuthenticated, logout } = useAuthStore();
   const { isDarkMode, toggleTheme } = useThemeStore();
-  const { setFilters } = useCourseStore();
+  useCourseStore();
   const navigate = useNavigate();
 
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -118,8 +118,7 @@ export const Navbar: React.FC = () => {
                   "absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-1 px-1.5 py-0.5 rounded border text-[10px] font-black uppercase tracking-tighter opacity-40",
                   isDarkMode ? "border-gray-700 text-gray-400" : "border-white/30 text-white"
                 )}>
-                  <span>CMD</span>
-                  <span>K</span>
+                  <Search className="h-3 w-3" />
                 </div>
               )}
               {search && (
@@ -174,8 +173,6 @@ export const Navbar: React.FC = () => {
                     )}>
                       {[
                         { icon: BookOpen, label: 'Course topics', active: true },
-                        { icon: Network, label: 'Skill paths', active: false },
-                        { icon: Briefcase, label: 'Career paths', active: false },
                       ].map(({ icon: Icon, label, active }) => (
                         <button
                           key={label}

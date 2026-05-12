@@ -14,26 +14,26 @@ interface FormErrors extends Partial<FormData> { }
 
 // Password rules matching backend RegisterDto exactly
 const PASSWORD_RULES = [
-  { id: 'length',    label: 'At least 8 characters',          test: (p: string) => p.length >= 8 },
-  { id: 'uppercase', label: 'One uppercase letter (A–Z)',      test: (p: string) => /[A-Z]/.test(p) },
-  { id: 'lowercase', label: 'One lowercase letter (a–z)',      test: (p: string) => /[a-z]/.test(p) },
-  { id: 'digit',     label: 'One number (0–9)',                test: (p: string) => /\d/.test(p) },
-  { id: 'special',   label: 'One special character (!@#$…)',   test: (p: string) => /[\W_]/.test(p) },
+  { id: 'length', label: 'At least 8 characters', test: (p: string) => p.length >= 8 },
+  { id: 'uppercase', label: 'One uppercase letter (A–Z)', test: (p: string) => /[A-Z]/.test(p) },
+  { id: 'lowercase', label: 'One lowercase letter (a–z)', test: (p: string) => /[a-z]/.test(p) },
+  { id: 'digit', label: 'One number (0–9)', test: (p: string) => /\d/.test(p) },
+  { id: 'special', label: 'One special character (!@#$…)', test: (p: string) => /[\W_]/.test(p) },
 ];
 
 function getStrengthInfo(password: string, passedCount: number) {
   if (!password) return { label: '', color: '', width: '0%' };
-  if (passedCount <= 1) return { label: 'Weak',   color: 'bg-red-500',    width: '20%' };
-  if (passedCount === 2) return { label: 'Fair',   color: 'bg-orange-400', width: '40%' };
-  if (passedCount === 3) return { label: 'Good',   color: 'bg-yellow-400', width: '60%' };
-  if (passedCount === 4) return { label: 'Strong', color: 'bg-blue-500',   width: '80%' };
-  return                        { label: 'Excellent', color: 'bg-green-500', width: '100%' };
+  if (passedCount <= 1) return { label: 'Weak', color: 'bg-red-500', width: '20%' };
+  if (passedCount === 2) return { label: 'Fair', color: 'bg-orange-400', width: '40%' };
+  if (passedCount === 3) return { label: 'Good', color: 'bg-yellow-400', width: '60%' };
+  if (passedCount === 4) return { label: 'Strong', color: 'bg-blue-500', width: '80%' };
+  return { label: 'Excellent', color: 'bg-green-500', width: '100%' };
 }
 
 export const RegisterPage: React.FC = () => {
   const { register, isLoading } = useAuth();
-  const [showPassword, setShowPassword]   = useState(false);
-  const [showConfirm, setShowConfirm]     = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const [passwordFocused, setPasswordFocused] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     firstName: '',
@@ -50,15 +50,15 @@ export const RegisterPage: React.FC = () => {
     () => PASSWORD_RULES.map(rule => ({ ...rule, passed: rule.test(formData.password) })),
     [formData.password]
   );
-  const passedCount  = ruleResults.filter(r => r.passed).length;
-  const allPassed    = passedCount === PASSWORD_RULES.length;
-  const strength     = getStrengthInfo(formData.password, passedCount);
+  const passedCount = ruleResults.filter(r => r.passed).length;
+  const allPassed = passedCount === PASSWORD_RULES.length;
+  const strength = getStrengthInfo(formData.password, passedCount);
 
   const validate = (): boolean => {
     const newErrors: FormErrors = {};
     if (!formData.firstName.trim()) newErrors.firstName = 'First name is required';
-    if (!formData.lastName.trim())  newErrors.lastName  = 'Last name is required';
-    if (!formData.email)            newErrors.email     = 'Email is required';
+    if (!formData.lastName.trim()) newErrors.lastName = 'Last name is required';
+    if (!formData.email) newErrors.email = 'Email is required';
     else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Enter a valid email';
 
     const pw = formData.password;
@@ -173,11 +173,10 @@ export const RegisterPage: React.FC = () => {
               {/* Student Card */}
               <div
                 onClick={() => setFormData(prev => ({ ...prev, role: 'Student' }))}
-                className={`relative flex items-start gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all duration-300 ${
-                  formData.role === 'Student'
+                className={`relative flex items-start gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all duration-300 ${formData.role === 'Student'
                     ? 'border-indigo-500 bg-indigo-50/50 dark:bg-indigo-500/10 shadow-md'
                     : 'border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-[#13151A] hover:border-indigo-300 dark:hover:border-indigo-500/50'
-                }`}
+                  }`}
               >
                 <div className={`p-2 rounded-lg shrink-0 transition-colors duration-300 ${formData.role === 'Student' ? 'bg-indigo-500 text-white shadow-sm' : 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700'}`}>
                   <GraduationCap className="w-5 h-5" />
@@ -196,11 +195,10 @@ export const RegisterPage: React.FC = () => {
               {/* Instructor Card */}
               <div
                 onClick={() => setFormData(prev => ({ ...prev, role: 'Instructor' }))}
-                className={`relative flex items-start gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all duration-300 ${
-                  formData.role === 'Instructor'
+                className={`relative flex items-start gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all duration-300 ${formData.role === 'Instructor'
                     ? 'border-indigo-500 bg-indigo-50/50 dark:bg-indigo-500/10 shadow-md'
                     : 'border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-[#13151A] hover:border-indigo-300 dark:hover:border-indigo-500/50'
-                }`}
+                  }`}
               >
                 <div className={`p-2 rounded-lg shrink-0 transition-colors duration-300 ${formData.role === 'Instructor' ? 'bg-indigo-500 text-white shadow-sm' : 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700'}`}>
                   <Briefcase className="w-5 h-5" />
@@ -256,12 +254,11 @@ export const RegisterPage: React.FC = () => {
                       style={{ width: strength.width }}
                     />
                   </div>
-                  <span className={`ml-3 text-xs font-semibold ${
-                    passedCount <= 1 ? 'text-red-500' :
-                    passedCount === 2 ? 'text-orange-400' :
-                    passedCount === 3 ? 'text-yellow-500' :
-                    passedCount === 4 ? 'text-blue-500' : 'text-green-500'
-                  }`}>
+                  <span className={`ml-3 text-xs font-semibold ${passedCount <= 1 ? 'text-red-500' :
+                      passedCount === 2 ? 'text-orange-400' :
+                        passedCount === 3 ? 'text-yellow-500' :
+                          passedCount === 4 ? 'text-blue-500' : 'text-green-500'
+                    }`}>
                     {strength.label}
                   </span>
                 </div>
@@ -273,7 +270,7 @@ export const RegisterPage: React.FC = () => {
                       <li key={rule.id} className="flex items-center gap-1.5 text-xs">
                         {rule.passed
                           ? <CheckCircle2 className="w-3.5 h-3.5 text-green-500 shrink-0" />
-                          : <XCircle     className="w-3.5 h-3.5 text-gray-300 dark:text-gray-600 shrink-0" />}
+                          : <XCircle className="w-3.5 h-3.5 text-gray-300 dark:text-gray-600 shrink-0" />}
                         <span className={rule.passed ? 'text-green-600 dark:text-green-400' : 'text-gray-400 dark:text-gray-500'}>
                           {rule.label}
                         </span>
