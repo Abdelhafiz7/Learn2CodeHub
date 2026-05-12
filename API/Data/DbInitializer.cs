@@ -19,45 +19,48 @@ public class DbInitializer
 
     private static void SeedData(WebContext context)
     {
-        context.Database.Migrate();
-
-        if (context.Courses.Any()) return;
-
-        var passwordService = new PasswordService();
-
-        var instructor = new User
+        try
         {
-            FirstName = "Test1",
-            LastName = "Instructor",
-            Email = "instructor11@test.com",
-            PasswordHash = passwordService.HashPassword("test"),
-            Role = UserRole.Instructor
-        };
+            context.Database.EnsureCreated();
 
-        context.Users.Add(instructor);
+            if (context.Courses.Any())
+                return;
 
-        var admin = new User
-        {
-            FirstName = "Abdelhafiz",
-            LastName = "Saleh",
-            Email = "3bdul7afiz@gmail.com",
-            PasswordHash = passwordService.HashPassword("admin123"),
-            Role = UserRole.Admin
-        };
+            var passwordService = new PasswordService();
 
-        context.Users.Add(admin);
+            var instructor = new User
+            {
+                FirstName = "Test1",
+                LastName = "Instructor",
+                Email = "instructor11@test.com",
+                PasswordHash = passwordService.HashPassword("test"),
+                Role = UserRole.Instructor
+            };
 
-        var category = new Category
-        {
-            Name = "Programming",
-            Description = "Programming Courses"
-        };
+            context.Users.Add(instructor);
 
-        context.Categories.Add(category);
+            var admin = new User
+            {
+                FirstName = "Abdelhafiz",
+                LastName = "Saleh",
+                Email = "3bdul7afiz@gmail.com",
+                PasswordHash = passwordService.HashPassword("admin123"),
+                Role = UserRole.Admin
+            };
 
-        context.SaveChanges();
+            context.Users.Add(admin);
 
-        var courses = new List<Course>
+            var category = new Category
+            {
+                Name = "Programming",
+                Description = "Programming Courses"
+            };
+
+            context.Categories.Add(category);
+
+            context.SaveChanges();
+
+            var courses = new List<Course>
         {
             new()
             {
@@ -69,6 +72,7 @@ public class DbInitializer
                 InstructorId = instructor.Id,
                 IsPublished = true
             },
+
             new()
             {
                 Title = "Course 2",
@@ -79,6 +83,7 @@ public class DbInitializer
                 InstructorId = instructor.Id,
                 IsPublished = true
             },
+
             new()
             {
                 Title = "Course 3",
@@ -91,7 +96,13 @@ public class DbInitializer
             }
         };
 
-        context.Courses.AddRange(courses);
-        context.SaveChanges();
+            context.Courses.AddRange(courses);
+
+            context.SaveChanges();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
     }
 }
