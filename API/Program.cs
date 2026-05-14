@@ -34,7 +34,8 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend",
         policy => policy
-            .WithOrigins("http://localhost:5173")
+            .WithOrigins("http://localhost:5173", 
+                         "https://learn2codehub-frontend.onrender.com")
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials());
@@ -72,7 +73,7 @@ builder.Services.AddAuthorization();
 var app = builder.Build();
 
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
